@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard – VirtualQ{% endblock %}
+
+{% block extra_head %}
+<style>
+    .dash-header {
+        padding: 28px 0 20px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 32px;
+    }
+    .dash-title {
+        font-family: 'Syne', sans-serif;
+        font-weight: 800;
+        font-size: 1.6rem;
+        letter-spacing: -0.5px;
+        margin-bottom: 2px;
+    }
+    .dash-sub { color: var(--muted); font-size: 0.88rem; }
+
+    /* Stats row */
+    .admin-stats {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 28px;
+    }
+    .astat {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 16px 22px;
+        min-width: 130px;
+    }
+    .astat-num {
+        font-family: 'Syne', sans-serif;
+        font-weight: 800;
+        font-size: 1.6rem;
+        line-height: 1;
+    }
+    .astat-label { font-size: 0.78rem; color: var(--muted); margin-top: 3px; }
+
+    /* Table */
+    .admin-table-wrap {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+    }
+    .admin-table-wrap .table { margin-bottom: 0; }
+    .admin-table-wrap thead th {
+        font-family: 'Syne', sans-serif;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--muted);
+        background: #fafaf8;
+        border-bottom: 1px solid var(--border);
+        padding: 14px 16px;
+        font-weight: 600;
+    }
+    .admin-table-wrap td {
+        padding: 14px 16px;
+        vertical-align: middle;
+        border-color: var(--border);
+        font-size: 0.9rem;
+    }
+    .admin-table-wrap tbody tr:last-child td { border-bottom: none; }
+    .admin-table-wrap tbody tr:hover td { background: #fafaf8; }
+
+    .token-mono {
+        font-family: 'Syne', sans-serif;
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: var(--accent2);
+        letter-spacing: 2px;
+    }
+
+    .form-select-sm { font-size: 0.85rem; border-radius: 6px; }
+    .btn-update {
+        background: var(--ink);
+        color: var(--white);
+        border: none;
+        padding: 6px 16px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        border-radius: 6px;
+        white-space: nowrap;
+        transition: background 0.2s;
+    }
+    .btn-update:hover { background: #222230; color: var(--white); }
+
+    .empty-cell {
+        text-align: center;
+        padding: 56px !important;
+        color: var(--muted);
+    }
+    .empty-cell i { font-size: 2rem; display: block; margin-bottom: 8px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dash-header">
+    <div class="d-flex align-items-center gap-2 mb-1">
+        <span class="section-tag">Admin</span>
+    </div>
+    <h2 class="dash-title">Application Manager</h2>
+    <p class="dash-sub mb-0">Review and update the status of all submitted applications.</p>
+</div>
+
+<!-- ── Stats ─────────────────────────────────────────── -->
+{% set waiting_count    = applications | selectattr('status', 'equalto', 'Waiting')    | list | length %}
+{% set processing_count = applications | selectattr('status', 'equalto', 'Processing') | list | length %}
+{% set completed_count  = applications | selectattr('status', 'equalto', 'Completed')  | list | length %}
+
+<div class="admin-stats">
+    <div class="astat">
+        <div class="astat-num">{{ applications | length }}</div>
+        <div class="astat-label">Total Applications</div>
+    </div>
+    <div class="astat" style="border-left: 3px solid #fcd34d;">
+        <div class="astat-num" style="color:#92400e;">{{ waiting_count }}</div>
+        <div class="astat-label">Waiting</div>
+    </div>
+    <div class="astat" style="border-left: 3px solid #93c5fd;">
+        <div class="astat-num" style="color:#1e40af;">{{ processing_count }}</div>
+        <div class="astat-label">Processing</div>
+    </div>
+    <div class="astat" style="border-left: 3px solid #86efac;">
+        <div class="astat-num" style="color:#166534;">{{ completed_count }}</div>
+        <div class="astat-label">Completed</div>
+    </div>
+</div>
+
+<!-- ── Table ─────────────────────────────────────────── -->
+<div class="admin-table-wrap">
+    <div class="table-responsive">
+        <table class="table vq-table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Token</th>
+                    <th>Email</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th class="text-end">Update Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app in applications %}
+                <tr>
+                    <td><span class="token-mono">{{ app.token }}</span></td>
+                    <td>{{ app.email }}</td>
+                    <td>
+                        <span class="d-inline-block text-truncate" style="max-width:200px;" title="{{ app.subject }}">
+                            {{ app.subject }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if app.status == 'Waiting' %}
+                            <span class="badge badge-waiting">Waiting</span>
+                        {% elif app.status == 'Processing' %}
+                            <span class="badge badge-processing">Processing</span>
+                        {% else %}
+                            <span class="badge badge-completed">Completed</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <form method="POST" action="{{ url_for('admin_dashboard') }}"
+                              class="d-inline-flex align-items-center gap-2">
+                            <input type="hidden" name="doc_id" value="{{ app.id }}">
+                            <select class="form-select form-select-sm" name="status" style="width:140px;">
+                                <option value="Waiting"    {% if app.status == 'Waiting'    %}selected{% endif %}>Waiting</option>
+                                <option value="Processing" {% if app.status == 'Processing' %}selected{% endif %}>Processing</option>
+                                <option value="Completed"  {% if app.status == 'Completed'  %}selected{% endif %}>Completed</option>
+                            </select>
+                            <button type="submit" class="btn-update">Update</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="empty-cell">
+                        <i class="bi bi-inbox"></i>
+                        No applications found yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

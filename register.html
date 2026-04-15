@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% block title %}Register – VirtualQ{% endblock %}
+
+{% block extra_head %}
+<style>
+    .auth-wrap {
+        min-height: calc(100vh - var(--nav-h) - 200px);
+        display: flex;
+        align-items: center;
+        padding: 48px 0;
+    }
+    .auth-card {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        max-width: 440px;
+        width: 100%;
+        margin: 0 auto;
+    }
+    .auth-header { padding: 36px 36px 0; }
+    .auth-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 1.75rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        margin-bottom: 4px;
+    }
+    .auth-sub { color: var(--muted); font-size: 0.88rem; }
+    .auth-body { padding: 28px 36px 36px; }
+    .form-label { font-weight: 600; font-size: 0.85rem; margin-bottom: 6px; }
+    .auth-footer-link {
+        background: #fafaf8;
+        border-top: 1px solid var(--border);
+        padding: 16px 36px;
+        text-align: center;
+        font-size: 0.87rem;
+        color: var(--muted);
+    }
+    .auth-footer-link a {
+        color: var(--accent2);
+        font-weight: 600;
+        text-decoration: none;
+    }
+    .auth-footer-link a:hover { text-decoration: underline; }
+    .input-icon-wrap { position: relative; }
+    .input-icon-wrap .bi {
+        position: absolute; left: 12px; top: 50%;
+        transform: translateY(-50%);
+        color: var(--muted); font-size: 0.95rem;
+    }
+    .input-icon-wrap .form-control { padding-left: 36px; }
+
+    .role-picker { display: flex; gap: 10px; }
+    .role-option { flex: 1; }
+    .role-option input[type=radio] { display: none; }
+    .role-label {
+        display: block;
+        border: 2px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 12px 16px;
+        cursor: pointer;
+        text-align: center;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--muted);
+        transition: all 0.15s;
+    }
+    .role-option input:checked + .role-label {
+        border-color: var(--accent2);
+        background: #eff6ff;
+        color: var(--accent2);
+    }
+    .role-label .ri { display: block; font-size: 1.4rem; margin-bottom: 4px; }
+    .btn-submit {
+        background: var(--ink);
+        color: var(--white);
+        border: none;
+        width: 100%;
+        padding: 12px;
+        font-family: 'Syne', sans-serif;
+        font-weight: 700;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+        border-radius: var(--radius-sm);
+        transition: background 0.2s;
+    }
+    .btn-submit:hover { background: #222230; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+    <div class="w-100">
+        <div class="auth-card shadow-sm">
+            <div class="auth-header">
+                <div class="section-tag mb-2">Create account</div>
+                <h2 class="auth-title">Join VirtualQ</h2>
+                <p class="auth-sub">Submit applications and track queue status.</p>
+            </div>
+            <div class="auth-body">
+                <form method="POST" action="{{ url_for('register') }}">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email address</label>
+                        <div class="input-icon-wrap">
+                            <i class="bi bi-envelope"></i>
+                            <input type="email" class="form-control" id="email" name="email"
+                                   required placeholder="you@example.com">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="input-icon-wrap">
+                            <i class="bi bi-lock"></i>
+                            <input type="password" class="form-control" id="password" name="password"
+                                   required placeholder="Choose a password">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Register as</label>
+                        <div class="role-picker">
+                            <div class="role-option">
+                                <input type="radio" id="role_user" name="role" value="user" checked>
+                                <label class="role-label" for="role_user">
+                                    <span class="ri"><i class="bi bi-person"></i></span>
+                                    User
+                                </label>
+                            </div>
+                            <div class="role-option">
+                                <input type="radio" id="role_admin" name="role" value="admin">
+                                <label class="role-label" for="role_admin">
+                                    <span class="ri"><i class="bi bi-shield-check"></i></span>
+                                    Admin
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit">
+                        Create account <i class="bi bi-arrow-right ms-1"></i>
+                    </button>
+                </form>
+            </div>
+            <div class="auth-footer-link">
+                Already have an account? <a href="{{ url_for('login') }}">Sign in</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
