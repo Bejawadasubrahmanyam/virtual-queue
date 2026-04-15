@@ -6,7 +6,7 @@ import random
 import string
 from functools import wraps
 
-app = Flask(__name__, template_folder=os.path.dirname(os.path.abspath(__file__)))
+app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
 # ─── Supabase Config ───────────────────────────────────────────────────────────
@@ -225,4 +225,5 @@ def queue_status():
 
 # ─── Run ───────────────────────────────────────────────────────────────────────
 if __name__ == '__main__':
-   app = Flask(__name__)
+    import os
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
