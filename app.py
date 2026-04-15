@@ -224,11 +224,5 @@ def queue_status():
 
 
 # ─── Run ───────────────────────────────────────────────────────────────────────
-from flask import Flask
-
-app = Flask(__name__)
-
-@app.route('/')
-def home():
-    return "Hello, Render!"
-
+if __name__ == '__main__':
+   app = Flask(__name__)
